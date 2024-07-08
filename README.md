@@ -1,4 +1,4 @@
-# `template-cg`
+# `cg-splat-vibes`
 > A custom graphics bundle that I was commissioned for
 
 This is a NodeCG graphics bundle, make sure you have a working NodeCG installation.
