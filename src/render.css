@@ -2,9 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: "Gilroy";
+  src: url("/src/assets/Gilroy-Bold.ttf");
+  font-weight: bold;
+  font-variant: normal;
+}
+
 @layer base {
-  html {
-    background-image: url("./render.jpg");
-    @apply bg-cover bg-no-repeat;
+  body {
+    @apply absolute inset-0 m-auto h-[1080px] w-[1920px] outline-red-500 outline-dashed outline-2 outline-offset-2;
+  }
+  #root {
+    /* background-image: url("./render.jpg"); */
+    @apply bg-cover bg-no-repeat relative h-full w-full;
   }
 }
