@@ -14,8 +14,6 @@ import assetStagesLeftTeam from "./assets/Stages - Left Team.png"
 import assetStagesRightTeam from "./assets/Stages - Right Team.png"
 import assetTeam1Win from "./assets/Team 1 - Win.png"
 import assetTeam2Win from "./assets/Team 2 - Win.png"
-import assetBracketOverlay from "./assets/Bracket - Overlay.png"
-import assetBracketBracket from "./assets/Bracket - Bracket.png"
 import gsap from "gsap"
 
 const scene = createMemo(() => replicants().currentBreakScreen)
@@ -33,7 +31,6 @@ function App() {
       <div class="absolute inset-0 flex flex-col items-stretch font-[Gilroy] font-bold">
         <SceneBRB />
         <SceneCasters />
-        <SceneBrackets />
         <Show when={scene() === "maplist"}>
           <div class="flex justify-between">
             <TeamHeading i={0} />
@@ -92,30 +89,6 @@ const SceneBRB = () => {
       class="absolute inset-0 flex flex-col items-stretch"
     >
       <img class="self-start" src={assetBrbLeftBar} />
-    </div>
-  )
-}
-
-const SceneBrackets = () => {
-  return (
-    <div
-      ref={(ref) => {
-        createEffect(() => {
-          if (scene() === "bracket") {
-            gsap.to(ref, { opacity: 1, delay: 0.5 })
-          } else {
-            gsap.to(ref, { opacity: 0 })
-          }
-        })
-      }}
-      class="absolute inset-0 flex flex-col items-stretch"
-    >
-      <div
-        class="absolute inset-0 pb-[49px] flex flex-col justify-end items-center"
-        style={{ "background-image": `url('${assetBracketOverlay}')` }}
-      >
-        <img src={assetBracketBracket} />
-      </div>
     </div>
   )
 }
@@ -202,18 +175,7 @@ const BottomBar = () => {
   const [display, setDisplay] = createSignal(scene())
 
   return (
-    <div
-      ref={(ref) => {
-        createEffect(() => {
-          if (scene() !== "bracket") {
-            gsap.to(ref, { opacity: 1, delay: 0.5 })
-          } else {
-            gsap.to(ref, { opacity: 0 })
-          }
-        })
-      }}
-      class="relative mt-auto"
-    >
+    <div class="relative mt-auto">
       <img src={assetCasterBottomBar} />
       <div
         ref={(ref) => {
