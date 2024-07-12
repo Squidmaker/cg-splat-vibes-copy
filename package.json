@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "@nodecg/types": "^2.1.12",
+    "gsap": "^3.12.5",
     "klona": "^2.0.6",
     "solid-js": "^1.8.18",
     "solid-transition-group": "^0.2.3"

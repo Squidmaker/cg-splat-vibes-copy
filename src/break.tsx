@@ -1,6 +1,13 @@
-import { createMemo, ParentProps, Show } from "solid-js"
+import {
+  Accessor,
+  createEffect,
+  createMemo,
+  createSignal,
+  ParentProps,
+  Show,
+} from "solid-js"
 import render from "./render"
-import replicants, { CasterBlock } from "./replicants"
+import replicants from "./replicants"
 import assetBrbLeftBar from "./assets/BRB - Left Bar.png"
 import assetCasterBottomBar from "./assets/Caster - Bottom Bar.png"
 import assetStagesLeftTeam from "./assets/Stages - Left Team.png"
@@ -9,25 +16,24 @@ import assetTeam1Win from "./assets/Team 1 - Win.png"
 import assetTeam2Win from "./assets/Team 2 - Win.png"
 import assetBracketOverlay from "./assets/Bracket - Overlay.png"
 import assetBracketBracket from "./assets/Bracket - Bracket.png"
+import gsap from "gsap"
+
+const scene = createMemo(() => replicants().currentBreakScreen)
+const flavorText = createMemo(() => replicants().currentFlavorText)
+const teams = createMemo(() => replicants().currentTeams)
+const scores = createMemo(() => replicants().currentScores)
+const scoreA = createMemo(() => scores()[0].toString())
+const scoreB = createMemo(() => scores()[1].toString())
+const teamNameA = createMemo(() => teams()[0].name)
+const teamNameB = createMemo(() => teams()[1].name)
 
 function App() {
-  const scene = createMemo(() => replicants().currentBreakScreen)
   return (
     <>
       <div class="absolute inset-0 flex flex-col items-stretch font-[Gilroy] font-bold">
-        <div class="absolute inset-0 flex flex-col items-stretch">
-          <Show when={scene() === "brb"}>
-            <img class="self-start" src={assetBrbLeftBar} />
-          </Show>
-          <Show when={scene() === "bracket"}>
-            <div
-              class="absolute inset-0 pb-[49px] flex flex-col justify-end items-center"
-              style={{ "background-image": `url('${assetBracketOverlay}')` }}
-            >
-              <img src={assetBracketBracket} />
-            </div>
-          </Show>
-        </div>
+        <SceneBRB />
+        <SceneCasters />
+        <SceneBrackets />
         <Show when={scene() === "maplist"}>
           <div class="flex justify-between">
             <TeamHeading i={0} />
@@ -58,47 +64,122 @@ function App() {
             ))}
           </div>
         </Show>
-        <Show when={scene() === "casters"}>
-          <div class="absolute inset-0 flex items-end mb-[calc(189px*1.5)] justify-around">
-            <div class="-rotate-3">
-              <CasterBlock
-                name={"name"}
-                pronouns={"pronouns"}
-                twitter={"@NAME"}
-              />
-            </div>
-            <div class="rotate-3">
-              <CasterBlock
-                name={"name"}
-                pronouns={"pronouns"}
-                twitter={"@NAME"}
-              />
-            </div>
-          </div>
-        </Show>
-        <Show when={scene() !== "bracket"}>
-          <BottomBar>
-            <Show when={scene() === "casters"}>
-              <div class="h-full flex items-center justify-center text-5xl gap-12">
-                <div class="flex-1 text-right">Team Name 2</div>
-                <div class="text-[#6a47f1]">0 - 0</div>
-                <div class="flex-1">Team Name 2</div>
-              </div>
-            </Show>
-            <Show when={scene() === "brb"}>
-              <div class="pl-10 h-full flex items-center text-7xl">
-                WE WILL BE RIGHT BACK
-              </div>
-            </Show>
-            <Show when={scene() === "maplist"}>
-              <div class="pl-10 h-full flex items-center text-6xl">
-                Round - Best of 5
-              </div>
-            </Show>
-          </BottomBar>
-        </Show>
+        <BottomBar />
       </div>
     </>
+  )
+}
+
+const SceneBRB = () => {
+  return (
+    <div
+      ref={(ref) =>
+        createEffect(() => {
+          if (scene() === "brb") {
+            gsap.to(ref, {
+              opacity: 1,
+              x: 0,
+              delay: 0.5,
+            })
+          } else {
+            gsap.to(ref, {
+              opacity: 0,
+              x: -50,
+            })
+          }
+        })
+      }
+      class="absolute inset-0 flex flex-col items-stretch"
+    >
+      <img class="self-start" src={assetBrbLeftBar} />
+    </div>
+  )
+}
+
+const SceneBrackets = () => {
+  return (
+    <div
+      ref={(ref) => {
+        createEffect(() => {
+          if (scene() === "bracket") {
+            gsap.to(ref, { opacity: 1, delay: 0.5 })
+          } else {
+            gsap.to(ref, { opacity: 0 })
+          }
+        })
+      }}
+      class="absolute inset-0 flex flex-col items-stretch"
+    >
+      <div
+        class="absolute inset-0 pb-[49px] flex flex-col justify-end items-center"
+        style={{ "background-image": `url('${assetBracketOverlay}')` }}
+      >
+        <img src={assetBracketBracket} />
+      </div>
+    </div>
+  )
+}
+
+const SceneCasters = () => {
+  let refA: HTMLDivElement | undefined
+  let refB: HTMLDivElement | undefined
+
+  createEffect(() => {
+    if (scene() === "casters") {
+      gsap.to(refA!, {
+        opacity: 1,
+        rotate: "-3deg",
+        y: 0,
+        delay: 0.5,
+      })
+      gsap.to(refB!, {
+        opacity: 1,
+        rotate: "3deg",
+        y: 0,
+        delay: 0.6,
+      })
+    } else {
+      gsap.to(refA!, {
+        opacity: 0,
+        rotate: "0deg",
+        y: 50,
+      })
+      gsap.to(refB!, {
+        opacity: 0,
+        rotate: "0deg",
+        y: 50,
+        delay: 0.1,
+      })
+    }
+  })
+
+  return (
+    <div class="absolute inset-0 flex items-end mb-[calc(189px*1.5)] justify-around">
+      <CasterBlock ref={refA} i={0} />
+      <CasterBlock ref={refB} i={1} />
+    </div>
+  )
+}
+
+export const CasterBlock = (props: {
+  i: 0 | 1
+  ref: HTMLDivElement | undefined
+}) => {
+  return (
+    <div
+      ref={props.ref}
+      class="h-[154px] w-[353px] rounded-[29px] bg-[#603bfa] flex flex-col items-stretch p-[12px] gap-[12px] text-center text-white"
+    >
+      <div class="h-full flex flex-col justify-center flex-1">
+        <div class="text-5xl leading-3">
+          <FadeSpan>{replicants().currentBlock.value[props.i].name}</FadeSpan>
+        </div>
+      </div>
+      <div class="text-4xl flex flex-col justify-center h-[89px] rounded-[calc(29px-12px)] bg-white/25">
+        <FadeSpan>{replicants().currentBlock.value[props.i].pronouns}</FadeSpan>
+        <FadeSpan>{replicants().currentBlock.value[props.i].twitter}</FadeSpan>
+      </div>
+    </div>
   )
 }
 
@@ -117,13 +198,90 @@ const TeamHeading = (props: ParentProps<{ i: 0 | 1 }>) => (
   </div>
 )
 
-const BottomBar = (props: ParentProps) => (
-  <div class="relative mt-auto">
-    <img src={assetCasterBottomBar} />
-    <div class="absolute inset-0 pt-5 text-white text-3xl">
-      {props.children}
+const BottomBar = () => {
+  const [display, setDisplay] = createSignal(scene())
+
+  return (
+    <div
+      ref={(ref) => {
+        createEffect(() => {
+          if (scene() !== "bracket") {
+            gsap.to(ref, { opacity: 1, delay: 0.5 })
+          } else {
+            gsap.to(ref, { opacity: 0 })
+          }
+        })
+      }}
+      class="relative mt-auto"
+    >
+      <img src={assetCasterBottomBar} />
+      <div
+        ref={(ref) => {
+          createEffect(() => {
+            const val = scene()
+            if (display() !== val) {
+              gsap
+                .timeline()
+                .to(ref, {
+                  opacity: 0,
+                })
+                .call(() => {
+                  setDisplay(val)
+                })
+                .to(ref, { opacity: 1 })
+            }
+            return val
+          })
+        }}
+        class="absolute inset-0 pt-5 pl-12 text-white text-7xl flex items-center"
+      >
+        <Show when={display() === "casters"}>
+          <div class="flex items-center w-full justify-center gap-12">
+            <div class="flex-1 text-right">
+              <FadeSpan>{teamNameA()}</FadeSpan>
+            </div>
+            <div class="text-[#6a47f1] tabular-nums">
+              <FadeSpan>{scoreA()}</FadeSpan> - <FadeSpan>{scoreB()}</FadeSpan>
+            </div>
+            <div class="flex-1">
+              <FadeSpan>{teamNameB()}</FadeSpan>
+            </div>
+          </div>
+        </Show>
+        <Show when={display() === "maplist"}>Round 1 ~ Game 3</Show>
+        <Show when={display() === "brb"}>
+          <FadeSpan>{flavorText()}</FadeSpan>
+        </Show>
+      </div>
     </div>
-  </div>
-)
+  )
+}
+
+const FadeSpan = (props: { children: string }) => {
+  const [text, setText] = createSignal(props.children)
+  return (
+    <span
+      ref={(ref) => {
+        createEffect(() => {
+          const val = props.children
+          if (text() !== val) {
+            gsap
+              .timeline()
+              .to(ref, {
+                opacity: 0,
+              })
+              .call(() => {
+                setText(val)
+              })
+              .to(ref, { opacity: 1 })
+          }
+          return val
+        })
+      }}
+    >
+      {text()}
+    </span>
+  )
+}
 
 render(App)

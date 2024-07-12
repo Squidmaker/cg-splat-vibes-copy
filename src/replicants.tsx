@@ -183,22 +183,4 @@ if (nodecg) {
   console.warn("NodeCG is not injected! Using default data")
 }
 
-export const CasterBlock = (props: {
-  name: string
-  twitter: string
-  pronouns: string
-}) => {
-  return (
-    <div class="h-[154px] w-[353px] rounded-[29px] bg-[#603bfa] flex flex-col items-stretch p-[12px] gap-[12px] text-center text-white">
-      <div class="h-full flex flex-col justify-center flex-1">
-        <div class="text-5xl leading-3">NAME</div>
-      </div>
-      <div class="text-4xl flex flex-col justify-center h-[89px] rounded-[calc(29px-12px)] bg-white/25">
-        <div class="leading-none">PRONOUNS</div>
-        <div class="leading-none">@NAME</div>
-      </div>
-    </div>
-  )
-}
-
 export default replicants

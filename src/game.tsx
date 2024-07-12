@@ -1,7 +1,8 @@
 import render from "./render"
-import replicants, { CasterBlock } from "./replicants"
+import replicants from "./replicants"
 import assetGameplayScores from "./assets/Gameplay - Scores.png"
 import assetGameplayCasters from "./assets/Gameplay - Casters.png"
+import { CasterBlock } from "./break"
 
 const App = () => {
   return (
