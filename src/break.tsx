@@ -1,11 +1,4 @@
-import {
-  Accessor,
-  createEffect,
-  createMemo,
-  createSignal,
-  ParentProps,
-  Show,
-} from "solid-js"
+import { createEffect, createMemo, createSignal, Index, Show } from "solid-js"
 import render from "./render"
 import replicants from "./replicants"
 import assetBrbLeftBar from "./assets/BRB - Left Bar.png"
@@ -24,6 +17,9 @@ const scoreA = createMemo(() => scores()[0].toString())
 const scoreB = createMemo(() => scores()[1].toString())
 const teamNameA = createMemo(() => teams()[0].name)
 const teamNameB = createMemo(() => teams()[1].name)
+const round = createMemo(() => replicants().currentRound)
+const mapWinners = createMemo(() => replicants().currentMapWinners)
+const maplist = createMemo(() => replicants().loadedData.maps)
 
 function App() {
   return (
@@ -31,37 +27,9 @@ function App() {
       <div class="absolute inset-0 flex flex-col items-stretch font-[Gilroy] font-bold">
         <SceneBRB />
         <SceneCasters />
-        <Show when={scene() === "maplist"}>
-          <div class="flex justify-between">
-            <TeamHeading i={0} />
-            <div class="text-8xl">VS</div>
-            <TeamHeading i={1} />
-          </div>
-          <div class="flex items-center justify-center h-full gap-[72px]">
-            {Array.from({ length: 5 }).map(() => (
-              <div class="relative h-[600px] w-[224px]">
-                <div class="h-full border-[12px] border-[#6a47f1] rounded-md flex flex-col text-5xl text-white grayscale-[25%] brightness-[50%]">
-                  <div class="h-full relative">
-                    <div
-                      class="absolute inset-0 bg-cover bg-center"
-                      style={{
-                        "background-image": `url('https://raw.githubusercontent.com/Sendouc/sendou.ink/rewrite/public/static-assets/img/stages/${1}.png')`,
-                      }}
-                    />
-                    <div class="absolute inset-0">Eeltail Alley</div>
-                  </div>
-                  <div class="bg-[#6a47f1] h-[150px] uppercase text-center flex items-center">
-                    Rain Maker
-                  </div>
-                </div>
-                <div class="absolute inset-0 flex items-center justify-center pb-[75px] rotate-3">
-                  <img class="min-w-max" src={assetTeam1Win} />
-                </div>
-              </div>
-            ))}
-          </div>
-        </Show>
+        <SceneMaplist />
         <BottomBar />
+        <TopBar />
       </div>
     </>
   )
@@ -134,6 +102,105 @@ const SceneCasters = () => {
   )
 }
 
+const SceneMaplist = () => {
+  const games = createMemo(() => {
+    if (scene() !== "maplist") {
+      return []
+    }
+    const winners = mapWinners()
+    const teamA = teamNameA()
+    const teamB = teamNameB()
+    const maps = maplist()
+    return round().value.map((game, i) => ({
+      winner: winners[i] === teamA ? "A" : winners[i] === teamB ? "B" : null,
+      map: game.map,
+      mapImage: `https://raw.githubusercontent.com/Sendouc/sendou.ink/rewrite/public/static-assets/img/stages/${
+        maps.indexOf(game.map) - 1
+      }.png`,
+      mode: game.mode === "Rainmaker" ? "Rain Maker" : game.mode,
+    }))
+  })
+  const [state, setState] = createSignal(games())
+
+  return (
+    <>
+      <div
+        ref={() => {
+          createEffect(() => {
+            if (games() !== state()) {
+              const tl = gsap.timeline()
+              tl.fromTo(
+                ".gsap-game",
+                { x: 0 },
+                {
+                  opacity: 0,
+                  x: 25,
+                  delay: 0.1,
+                  stagger: 0.1,
+                }
+              ).call(() => {
+                setState(games())
+                tl.fromTo(
+                  ".gsap-game",
+                  { opacity: 0, x: -25 },
+                  {
+                    opacity: 1,
+                    x: 0,
+                    delay: 0.5,
+                    stagger: 0.1,
+                  }
+                )
+              })
+            }
+          })
+        }}
+        class="absolute inset-0 flex items-center justify-center gap-[48px]"
+      >
+        <Index each={state()}>
+          {(game, i) => (
+            <div class="gsap-game relative h-[560px] w-[224px]">
+              <div
+                class={`h-full border-[12px] border-[#6a47f1] rounded-md flex flex-col text-4xl text-white ${
+                  game().winner && "grayscale-[25%] brightness-[50%]"
+                }`}
+              >
+                <div class="h-full relative">
+                  <div
+                    class="absolute inset-0 bg-cover bg-center"
+                    style={{
+                      "background-image": `url('${game().mapImage}')`,
+                    }}
+                  />
+                  <div class="absolute inset-0 ml-1" style={strokeShadow(2)}>
+                    <FadeSpan>{game().map}</FadeSpan>
+                  </div>
+                </div>
+                <div class="bg-[#6a47f1] h-[125px] uppercase text-center flex items-center justify-center">
+                  <div class="w-0 mx-auto flex justify-center">
+                    <FadeSpan>{game().mode}</FadeSpan>
+                  </div>
+                </div>
+              </div>
+              <div
+                class={`absolute inset-0 flex items-center justify-center pb-[75px] ${
+                  i % 2 ? "rotate-3" : "-rotate-3"
+                }`}
+              >
+                <Show when={game().winner}>
+                  <img
+                    class="min-w-max"
+                    src={game().winner === "A" ? assetTeam1Win : assetTeam2Win}
+                  />
+                </Show>
+              </div>
+            </div>
+          )}
+        </Index>
+      </div>
+    </>
+  )
+}
+
 export const CasterBlock = (props: {
   i: 0 | 1
   ref: HTMLDivElement | undefined
@@ -156,20 +223,60 @@ export const CasterBlock = (props: {
   )
 }
 
-const TeamHeading = (props: ParentProps<{ i: 0 | 1 }>) => (
-  <div class="relative">
-    <img src={props.i ? assetStagesRightTeam : assetStagesLeftTeam} />
-    <div
-      class={`absolute inset-0 flex items-center pb-6 ${
-        props.i ? "flex-row-reverse" : "flex-row"
-      }`}
-    >
-      <div class="shrink-0 w-12"></div>
-      <div class="shrink-0 text-8xl">1</div>
-      <div class="flex-1 text-center text-7xl">Team Name {props.i}</div>
+const TopBar = () => {
+  createEffect(() => {
+    if (scene() === "maplist") {
+      gsap.fromTo(
+        ".gsap-topbar",
+        { opacity: 0, y: -20 },
+        {
+          opacity: 1,
+          stagger: 0.1,
+          y: 0,
+          delay: 0.5,
+        }
+      )
+    } else {
+      gsap.to(".gsap-topbar", {
+        opacity: 0,
+        y: -25,
+        stagger: -0.1,
+      })
+    }
+  })
+
+  return (
+    <div class="gsap-topbar absolute inset-0 flex items-start justify-between">
+      <div class="relative">
+        <img src={assetStagesLeftTeam} />
+        <div class={`absolute inset-0 flex items-center pb-6 ${"flex-row"}`}>
+          <div class="shrink-0 w-12"></div>
+          <div class="shrink-0 text-8xl tabular-nums">
+            <FadeSpan>{scoreA()}</FadeSpan>
+          </div>
+          <div class="flex-1 text-center text-7xl">
+            <FadeSpan>{teamNameA()}</FadeSpan>
+          </div>
+        </div>
+      </div>
+      <div class="gsap-topbar text-8xl">VS</div>
+      <div class="gsap-topbar relative">
+        <img src={assetStagesRightTeam} />
+        <div
+          class={`absolute inset-0 flex items-center pb-6 ${"flex-row-reverse"}`}
+        >
+          <div class="shrink-0 w-12"></div>
+          <div class="shrink-0 text-8xl tabular-nums">
+            <FadeSpan>{scoreB()}</FadeSpan>
+          </div>
+          <div class="flex-1 text-center text-7xl">
+            <FadeSpan>{teamNameB()}</FadeSpan>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-)
+  )
+}
 
 const BottomBar = () => {
   const [display, setDisplay] = createSignal(scene())
@@ -245,5 +352,17 @@ const FadeSpan = (props: { children: string }) => {
     </span>
   )
 }
+
+const strokeShadow = (size: number) => ({
+  "text-shadow": `
+    -${size}px -${size}px 0 #000,
+    0   -${size}px 0 #000,
+    ${size}px -${size}px 0 #000,
+    ${size}px  0   0 #000,
+    ${size}px  ${size}px 0 #000,
+    0    ${size}px 0 #000,
+    -${size}px  ${size}px 0 #000,
+    -${size}px  0   0 #000`,
+})
 
 render(App)

@@ -10,7 +10,7 @@ const defaults: {
   currentColors: [string, string]
   currentFlavorText: string
   currentGameScreen: { showScores: boolean; showCommentators: boolean }
-  currentMapWinners: ("A" | "B")[]
+  currentMapWinners: (string | undefined)[]
   currentMusic: { song: string; artist: string }
   currentRound: { name: string; value: { map: string; mode: string }[] }
   currentScores: [number, number]
@@ -41,7 +41,7 @@ const defaults: {
       { name: "Comm 2", twitter: "@Comm2", pronouns: "any" },
     ],
   },
-  currentBreakScreen: "brb",
+  currentBreakScreen: "",
   currentColors: ["#d0be08", "#3a0ccd"],
   currentFlavorText: "Hello World!",
   currentGameScreen: {
