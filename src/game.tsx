@@ -5,7 +5,6 @@ import assetGameplayCasters from "./assets/Gameplay - Casters.png"
 import { createEffect, createMemo, createSignal, onCleanup } from "solid-js"
 import gsap from "gsap"
 
-const scene = createMemo(() => replicants().currentBreakScreen)
 const teams = createMemo(() => replicants().currentTeams)
 const scores = createMemo(() => replicants().currentScores)
 const scoreA = createMemo(() => scores()[0].toString())
@@ -13,6 +12,10 @@ const scoreB = createMemo(() => scores()[1].toString())
 const teamNameA = createMemo(() => teams()[0].name)
 const teamNameB = createMemo(() => teams()[1].name)
 const round = createMemo(() => replicants().currentRound)
+const showScores = createMemo(() => replicants().currentGameScreen.showScores)
+const showCommentators = createMemo(
+  () => replicants().currentGameScreen.showCommentators
+)
 
 const App = () => {
   return (
@@ -30,28 +33,34 @@ const GameScene = () => {
 
   createEffect(() => {
     let ctx = gsap.context(() => {
-      if (scene() === "game") {
-        gsap.timeline().to([casters0, casters1, casters2, scoreboard], {
+      if (showScores()) {
+        gsap.to(scoreboard!, { opacity: 1, x: 0 })
+      } else {
+        gsap.to(scoreboard!, { opacity: 0, x: -50 })
+      }
+    })
+    onCleanup(() => ctx.kill())
+  })
+
+  createEffect(() => {
+    let ctx = gsap.context(() => {
+      if (showCommentators()) {
+        gsap.to([casters0, casters1, casters2], {
           opacity: 1,
           x: 0,
           stagger: 0.1,
         })
       } else {
-        gsap
-          .timeline()
-          .to(scoreboard!, {
-            opacity: 0,
-            x: -50,
-          })
-          .to([casters0, casters1, casters2], {
-            opacity: 0,
-            x: 50,
-            stagger: 0.1,
-          })
+        gsap.to([casters0, casters1, casters2], {
+          opacity: 0,
+          x: 50,
+          stagger: 0.1,
+        })
       }
     })
     onCleanup(() => ctx.kill())
   })
+
   return (
     <>
       <div
