@@ -1,14 +1,6 @@
 {
   "name": "cg-splat-vibes",
   "version": "0.1.0",
-  "devDependencies": {
-    "autoprefixer": "^10.4.13",
-    "postcss": "^8.4.21",
-    "postcss-preset-env": "^8.0.1",
-    "tailwindcss": "^3.2.7",
-    "vite": "^4.1.4",
-    "vite-plugin-solid": "^2.10.2"
-  },
   "nodecg": {
     "compatibleRange": ">=1.8.1",
     "graphics": [
@@ -35,6 +27,12 @@
     "gsap": "^3.12.5",
     "klona": "^2.0.6",
     "solid-js": "^1.8.18",
-    "solid-transition-group": "^0.2.3"
+    "solid-transition-group": "^0.2.3",
+    "autoprefixer": "^10.4.13",
+    "postcss": "^8.4.21",
+    "postcss-preset-env": "^8.0.1",
+    "tailwindcss": "^3.2.7",
+    "vite": "^4.1.4",
+    "vite-plugin-solid": "^2.10.2"
   }
 }
