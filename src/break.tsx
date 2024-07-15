@@ -1,10 +1,18 @@
-import { createEffect, createMemo, createSignal, Index, Show } from "solid-js"
+import {
+  createEffect,
+  createMemo,
+  createSignal,
+  Index,
+  onCleanup,
+  Show,
+} from "solid-js"
 import render from "./render"
 import replicants from "./replicants"
 import assetBrbLeftBar from "./assets/BRB - Left Bar.png"
 import assetCasterBottomBar from "./assets/Caster - Bottom Bar.png"
 import assetStagesLeftTeam from "./assets/Stages - Left Team.png"
 import assetStagesRightTeam from "./assets/Stages - Right Team.png"
+import assetGameplayScores from "./assets/Gameplay - Scores.png"
 import assetTeam1Win from "./assets/Team 1 - Win.png"
 import assetTeam2Win from "./assets/Team 2 - Win.png"
 import gsap from "gsap"
@@ -23,15 +31,13 @@ const maplist = createMemo(() => replicants().loadedData.maps)
 
 function App() {
   return (
-    <>
-      <div class="absolute inset-0 flex flex-col items-stretch font-[Gilroy] font-bold">
-        <SceneBRB />
-        <SceneCasters />
-        <SceneMaplist />
-        <BottomBar />
-        <TopBar />
-      </div>
-    </>
+    <div class="absolute inset-0 flex flex-col items-stretch font-[Gilroy] font-bold whitespace-nowrap">
+      <SceneBRB />
+      <SceneCasters />
+      <SceneMaplist />
+      <BottomBar />
+      <TopBar />
+    </div>
   )
 }
 
@@ -44,7 +50,6 @@ const SceneBRB = () => {
             gsap.to(ref, {
               opacity: 1,
               x: 0,
-              delay: 0.5,
             })
           } else {
             gsap.to(ref, {
@@ -127,31 +132,32 @@ const SceneMaplist = () => {
       <div
         ref={() => {
           createEffect(() => {
-            if (games() !== state()) {
-              const tl = gsap.timeline()
-              tl.fromTo(
-                ".gsap-game",
-                { x: 0 },
-                {
-                  opacity: 0,
-                  x: 25,
-                  delay: 0.1,
-                  stagger: 0.1,
-                }
-              ).call(() => {
-                setState(games())
-                tl.fromTo(
-                  ".gsap-game",
-                  { opacity: 0, x: -25 },
-                  {
-                    opacity: 1,
-                    x: 0,
-                    delay: 0.5,
+            let ctx = gsap.context(() => {
+              if (games() !== state()) {
+                gsap
+                  .timeline()
+                  .to(".gsap-game", {
+                    opacity: 0,
+                    x: 25,
+                    delay: 0.1,
                     stagger: 0.1,
-                  }
-                )
-              })
-            }
+                  })
+                  .call(() => {
+                    setState(games())
+                    gsap.fromTo(
+                      ".gsap-game",
+                      { opacity: 0, x: -25 },
+                      {
+                        opacity: 1,
+                        x: 0,
+                        delay: 0.5,
+                        stagger: 0.1,
+                      }
+                    )
+                  })
+              }
+            })
+            onCleanup(() => ctx.kill())
           })
         }}
         class="absolute inset-0 flex items-center justify-center gap-[48px]"
@@ -171,12 +177,15 @@ const SceneMaplist = () => {
                       "background-image": `url('${game().mapImage}')`,
                     }}
                   />
-                  <div class="absolute inset-0 ml-1" style={strokeShadow(2)}>
+                  <div
+                    class="whitespace-normal absolute inset-0 ml-1"
+                    style={strokeShadow(2)}
+                  >
                     <FadeSpan>{game().map}</FadeSpan>
                   </div>
                 </div>
                 <div class="bg-[#6a47f1] h-[125px] uppercase text-center flex items-center justify-center">
-                  <div class="w-0 mx-auto flex justify-center">
+                  <div class="whitespace-normal w-0 mx-auto flex justify-center">
                     <FadeSpan>{game().mode}</FadeSpan>
                   </div>
                 </div>
@@ -201,10 +210,7 @@ const SceneMaplist = () => {
   )
 }
 
-export const CasterBlock = (props: {
-  i: 0 | 1
-  ref: HTMLDivElement | undefined
-}) => {
+const CasterBlock = (props: { i: 0 | 1; ref?: HTMLDivElement }) => {
   return (
     <div
       ref={props.ref}
@@ -233,7 +239,6 @@ const TopBar = () => {
           opacity: 1,
           stagger: 0.1,
           y: 0,
-          delay: 0.5,
         }
       )
     } else {
