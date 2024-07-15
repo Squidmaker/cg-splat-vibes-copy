@@ -23,13 +23,7 @@ module.exports = (nodecg) => {
     obs.on("ConnectionOpened", () => {
       console.log(`Connected to OBS at ${ip}`)
     })
-    obs.on("CurrentProgramSceneChanged", (data) => {
-      if (data) {
-        scene.value = data.sceneName.toLowerCase()
-      } else {
-        setObsScene()
-      }
-    })
+    obs.on("CurrentProgramSceneChanged", setObsScene)
     obs.on("Identified", setObsScene)
     obs.on("SceneListChanged", setObsScene)
     obs.on("CurrentSceneCollectionChanged", setObsScene)
