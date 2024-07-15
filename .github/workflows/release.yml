@@ -19,7 +19,7 @@ jobs:
           node-version: 18
       - run: npm i
       - run: npm run build
-      - run: zip -r ${{ github.event.repository.name }}.zip graphics package.json LICENSE
+      - run: zip -r ${{ github.event.repository.name }}.zip graphics extension package.json LICENSE
       - uses: svenstaro/upload-release-action@v2
         with:
           file: "${{ github.event.repository.name }}.zip"
