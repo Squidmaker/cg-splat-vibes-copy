@@ -10,7 +10,7 @@ module.exports = (nodecg) => {
   const obs = new OBSWebSocket.default()
 
   const setObsScene = () =>
-    obs.call("GetSceneList").then(() => {
+    obs.call("GetSceneList").then((data) => {
       const newScene = scenes.find((scene) =>
         data.currentProgramSceneName.toLowerCase().includes("#" + scene)
       )
