@@ -322,7 +322,9 @@ const BottomBar = () => {
             </div>
           </div>
         </Show>
-        <Show when={display() === "maplist"}>Round 1 ~ Game 3</Show>
+        <Show when={display() === "maplist"}>
+          <FadeSpan>{round().name}</FadeSpan>
+        </Show>
         <Show when={display() === "brb"}>
           <FadeSpan>{flavorText()}</FadeSpan>
         </Show>
