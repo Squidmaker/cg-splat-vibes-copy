@@ -1,7 +1,7 @@
 const OBSWebSocket = require("obs-websocket-js")
 
 const scenes = ["brb", "maplist", "casters"]
-const ip = `ws://192.168.1.158:4455`
+const ip = `ws://localhost:4455`
 
 module.exports = (nodecg) => {
   const scene = nodecg.Replicant("currentBreakScreen", "cq-dashboard", {
