@@ -22,13 +22,14 @@ module.exports = (nodecg) => {
       console.log(`Connected to OBS at ${ip}`)
     })
     obs.on("SceneTransitionStarted", () => {
-      obs.call("GetCurrentPreviewScene").then((data) => {
-        console.log(data)
-        const newScene = scenes.find((scene) =>
+      obs.call("GetSceneList").then((data) => {
+        let obsScene =
+          data.currentPreviewSceneName || data.currentProgramSceneName
+        obsScene = scenes.find((scene) =>
           data.currentPreviewSceneName.toLowerCase().includes("#" + scene)
         )
-        if (newScene) {
-          scene.value = newScene
+        if (scene) {
+          scene.value = obsScene
         }
       })
     })
