@@ -166,7 +166,7 @@ const SceneMaplist = () => {
           {(game, i) => (
             <div class="gsap-game relative h-[560px] w-[224px]">
               <div
-                class={`h-full border-[12px] border-[#6a47f1] rounded-md flex flex-col text-4xl text-white ${
+                class={`h-full border-[12px] border-primary rounded-md flex flex-col text-4xl text-white ${
                   game().winner && "grayscale-[25%] brightness-[50%]"
                 }`}
               >
@@ -184,7 +184,7 @@ const SceneMaplist = () => {
                     <FadeSpan>{game().map}</FadeSpan>
                   </div>
                 </div>
-                <div class="bg-[#6a47f1] h-[125px] uppercase text-center flex items-center justify-center">
+                <div class="bg-primary h-[125px] uppercase text-center flex items-center justify-center">
                   <div class="whitespace-normal w-0 mx-auto flex justify-center">
                     <FadeSpan>{game().mode}</FadeSpan>
                   </div>
@@ -214,7 +214,7 @@ const CasterBlock = (props: { i: 0 | 1; ref?: HTMLDivElement }) => {
   return (
     <div
       ref={props.ref}
-      class="h-[154px] w-[353px] rounded-[29px] bg-[#603bfa] flex flex-col items-stretch p-[12px] gap-[12px] text-center text-white"
+      class="h-[154px] w-[353px] rounded-[29px] bg-primary flex flex-col items-stretch p-[12px] gap-[12px] text-center text-white"
     >
       <div class="h-full flex flex-col justify-center flex-1">
         <div class="text-5xl leading-3">
@@ -314,7 +314,7 @@ const BottomBar = () => {
             <div class="flex-1 text-right">
               <FadeSpan>{teamNameA()}</FadeSpan>
             </div>
-            <div class="text-[#6a47f1] tabular-nums">
+            <div class="text-primary tabular-nums">
               <FadeSpan>{scoreA()}</FadeSpan> - <FadeSpan>{scoreB()}</FadeSpan>
             </div>
             <div class="flex-1">

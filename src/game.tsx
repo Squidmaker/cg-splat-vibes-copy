@@ -107,7 +107,7 @@ const CasterBlock = (props: { i: 0 | 1; ref?: HTMLDivElement }) => {
   return (
     <div
       ref={props.ref}
-      class="opacity-0 h-[154px] w-[353px] rounded-[29px] bg-[#603bfa] flex flex-col items-stretch p-[12px] gap-[12px] text-center text-white"
+      class="opacity-0 h-[154px] w-[353px] rounded-[29px] bg-primary flex flex-col items-stretch p-[12px] gap-[12px] text-center text-white"
     >
       <div class="h-full flex flex-col justify-center flex-1">
         <div class="text-5xl leading-3">
