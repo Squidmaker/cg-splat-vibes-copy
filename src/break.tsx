@@ -119,9 +119,12 @@ const SceneMaplist = () => {
     return round().value.map((game, i) => ({
       winner: winners[i] === teamA ? "A" : winners[i] === teamB ? "B" : null,
       map: game.map,
-      mapImage: `https://raw.githubusercontent.com/Sendouc/sendou.ink/rewrite/public/static-assets/img/stages/${
-        maps.indexOf(game.map) - 1
-      }.png`,
+      mapImage:
+        maps.indexOf(game.map) > 0
+          ? `https://raw.githubusercontent.com/Sendouc/sendou.ink/rewrite/public/static-assets/img/stages/${
+              maps.indexOf(game.map) - 1
+            }.png`
+          : null,
       mode: game.mode === "Rainmaker" ? "Rain Maker" : game.mode,
     }))
   })
@@ -152,7 +155,7 @@ const SceneMaplist = () => {
                         x: 0,
                         delay: 0.5,
                         stagger: 0.1,
-                      }
+                      },
                     )
                   })
               }
@@ -172,20 +175,35 @@ const SceneMaplist = () => {
               >
                 <div class="h-full relative">
                   <div
-                    class="absolute inset-0 bg-cover bg-center"
-                    style={{
-                      "background-image": `url('${game().mapImage}')`,
-                    }}
+                    class="absolute inset-0 bg-cover bg-center bg-primary"
+                    style={
+                      game().mapImage
+                        ? {
+                            "background-image": `url('${game().mapImage}')`,
+                          }
+                        : undefined
+                    }
                   />
-                  <div
-                    class="whitespace-normal absolute inset-0 ml-1"
-                    style={strokeShadow(2)}
+                  <Show
+                    when={game().mapImage}
+                    fallback={
+                      <div class="absolute inset-0 flex items-center justify-center text-9xl opacity-80">
+                        ?
+                      </div>
+                    }
                   >
-                    <FadeSpan>{game().map}</FadeSpan>
-                  </div>
+                    <div
+                      class="whitespace-normal absolute inset-0 ml-1"
+                      style={strokeShadow(2)}
+                    >
+                      <FadeSpan>{game().map}</FadeSpan>
+                    </div>
+                  </Show>
                 </div>
                 <div class="bg-primary h-[125px] uppercase text-center flex items-center justify-center">
-                  <div class="whitespace-normal w-0 mx-auto flex justify-center">
+                  <div
+                    class={`whitespace-normal w-0 mx-auto flex justify-center ${game().mode === "(counterpick)" && "opacity-60 text-2xl"}`}
+                  >
                     <FadeSpan>{game().mode}</FadeSpan>
                   </div>
                 </div>
@@ -239,7 +257,7 @@ const TopBar = () => {
           opacity: 1,
           stagger: 0.1,
           y: 0,
-        }
+        },
       )
     } else {
       gsap.to(".gsap-topbar", {
